@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 	"scn-tusd-server/services"
+	"strings"
 
 	"github.com/tus/tusd/v2/pkg/azurestore"
 	"github.com/tus/tusd/v2/pkg/handler"
+	"github.com/tus/tusd/v2/pkg/hooks"
 	"github.com/tus/tusd/v2/pkg/memorylocker"
 )
 
@@ -25,24 +27,44 @@ func main() {
 		stderr.Fatalf(err.Error())
 	}
 
-	tusdHandler, err := handler.NewHandler(handler.Config{
+	var tusHandler *handler.Handler
+
+	config := handler.Config{
 		BasePath:              "/files/",
 		StoreComposer:         composer,
 		NotifyCompleteUploads: true,
-	})
+	}
+
+	enabledHooks := []hooks.HookType{"pre-create", "post-finish"}
+
+	hookHandler := services.GetHookHandler(&config)
+	if hookHandler != nil {
+		tusHandler, err = hooks.NewHandlerWithHooks(&config, hookHandler, enabledHooks)
+
+		var enabledHooksString []string
+		for _, h := range enabledHooks {
+			enabledHooksString = append(enabledHooksString, string(h))
+		}
+
+		stdout.Printf("Enabled hook events: %s", strings.Join(enabledHooksString, ", "))
+
+	} else {
+		tusHandler, err = handler.NewHandler(config)
+	}
+
 	if err != nil {
 		stderr.Fatalf("unable to create handler: %s", err)
 	}
 
 	go func() {
 		for {
-			event := <-tusdHandler.CompleteUploads
+			event := <-tusHandler.CompleteUploads
 			stdout.Printf("upload %s finished\n", event.Upload.ID)
 		}
 	}()
 
-	http.Handle("/files/", http.StripPrefix("/files/", tusdHandler))
-	http.Handle("/files", http.StripPrefix("/files", tusdHandler))
+	http.Handle("/files/", http.StripPrefix("/files/", tusHandler))
+	http.Handle("/files", http.StripPrefix("/files", tusHandler))
 	http.HandleFunc("/", services.DisplayGreeting)
 
 	stdout.Printf("Tusd server is hosting at http://localhost:8080/files\n")
