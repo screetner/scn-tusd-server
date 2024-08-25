@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	functionHook "scn-tusd-server/hooks"
 	"scn-tusd-server/services"
 	"strings"
 
@@ -35,9 +36,9 @@ func main() {
 		NotifyCompleteUploads: true,
 	}
 
-	enabledHooks := []hooks.HookType{"pre-create", "post-finish"}
+	enabledHooks := []hooks.HookType{"pre-create", "pre-finish"}
 
-	hookHandler := services.GetHookHandler(&config)
+	hookHandler := functionHook.GetHookHandler(&config)
 	if hookHandler != nil {
 		tusHandler, err = hooks.NewHandlerWithHooks(&config, hookHandler, enabledHooks)
 
