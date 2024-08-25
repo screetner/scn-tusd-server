@@ -2,7 +2,7 @@ package hooks
 
 import (
 	"github.com/tus/tusd/v2/pkg/hooks"
-	hook_services "scn-tusd-server/hooks/hook-services"
+	hookServices "scn-tusd-server/hooks/hook-services"
 )
 
 type FunctionHook struct {
@@ -17,10 +17,10 @@ func (h *FunctionHook) Setup() error {
 func (h *FunctionHook) InvokeHook(req hooks.HookRequest) (res hooks.HookResponse, err error) {
 	switch req.Type {
 	case hooks.HookPreCreate:
-		res, err = hook_services.PreCreateHookHandler(req)
+		res, err = hookServices.PreCreateHookHandler(req)
 		break
 	case hooks.HookPreFinish:
-		res, err = hook_services.PreFinishHookHandler(req)
+		res, err = hookServices.PreFinishHookHandler(req)
 		break
 	}
 
