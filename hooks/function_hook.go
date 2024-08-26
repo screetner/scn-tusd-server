@@ -18,11 +18,9 @@ func (h *FunctionHook) InvokeHook(req hooks.HookRequest) (res hooks.HookResponse
 	switch req.Type {
 	case hooks.HookPreCreate:
 		res, err = hookServices.PreCreateHookHandler(req)
-		break
 	case hooks.HookPreFinish:
 		res, err = hookServices.PreFinishHookHandler(req)
-		break
 	}
 
-	return res, nil
+	return res, err
 }
