@@ -25,7 +25,10 @@ func main() {
 		stderr.Fatalf(err.Error())
 	}
 
-	err = godotenv.Load()
+	if os.Getenv("ENV") != "prod" {
+		err = godotenv.Load()
+	}
+
 	if err != nil {
 		stderr.Fatalf("unable to load .env file: %v", err)
 	}
