@@ -1,4 +1,4 @@
-FROM golang:1.21.5-alpine3.18 AS builder
+FROM golang:1.23.0-alpine AS builder
 
 WORKDIR /app
 
@@ -8,7 +8,18 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go
+RUN set -xe \
+    && CGO_ENABLED=0 GOOS=linux go build \
+        -ldflags="\
+          -X scn-tusd-server/services.VersionName=$(go list -m -f "{{ .Version }}" github.com/tus/tusd/v2) \
+          -X 'scn-tusd-server/services.BuildDate=$(date --utc)'" \
+        -o main main.go
+
+FROM alpine:3.20.2 AS final
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
 
 EXPOSE 8080
 
