@@ -49,12 +49,6 @@ func CreateComposer() (*handler.StoreComposer, error) {
 }
 
 func ReadAzureConfig() (*TusdAzureConfig, error) {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("unable to load .env file: %v", err)
-	}
-
 	accountName := os.Getenv("AZURE_STORAGE_ACCOUNT")
 	if accountName == "" {
 		return nil, fmt.Errorf("no service account name for Azure BlockBlob Storage using the AZURE_STORAGE_ACCOUNT environment variable")
