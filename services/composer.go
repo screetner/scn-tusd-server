@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/tus/tusd/v2/pkg/azurestore"
 	"github.com/tus/tusd/v2/pkg/handler"
 	"github.com/tus/tusd/v2/pkg/memorylocker"
