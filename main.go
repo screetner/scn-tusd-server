@@ -20,17 +20,18 @@ func main() {
 	// Credits to tusd
 	// Link: https://github.com/tus/tusd/blob/main/cmd/tusd/cli/composer.go
 
+	if os.Getenv("ENV") != "prod" {
+		err := godotenv.Load()
+		if err != nil {
+			stderr.Fatalf("Error loading .env file: %v", err)
+		}
+	}
+
 	composer, err := services.CreateComposer()
 	if err != nil {
 		stderr.Fatalf(err.Error())
 	}
 
-	if os.Getenv("ENV") != "prod" {
-		// Load the .env file
-		if err := godotenv.Load(); err != nil {
-			log.Fatalf("unable to load .env file: %v", err)
-		}
-	}
 
 	basePath := os.Getenv("BASE_PATH")
 	if basePath == "" {
