@@ -27,8 +27,6 @@ func PreCreateHookHandler(req hooks.HookRequest) (res hooks.HookResponse, err er
 		return res, sessionNameErr
 	}
 
-	uniqueSessionId := uid()
-
 	if res.ChangeFileInfo.MetaData == nil {
 		res.ChangeFileInfo.MetaData = make(map[string]string)
 	}
@@ -82,8 +80,10 @@ func PreCreateHookHandler(req hooks.HookRequest) (res hooks.HookResponse, err er
 	userId := userInfo.UserId
 	username := userInfo.UserName
 
+	postfix := userId
+
 	organizationDirectory := fmt.Sprintf("%s_%s", organizationName, organizationId)
-	sessionDirectory := fmt.Sprintf("%s_%s", sessionName, uniqueSessionId)
+	sessionDirectory := fmt.Sprintf("%s_%s", sessionName, postfix)
 	id := fmt.Sprintf("%s/records/%s/%s", organizationDirectory, sessionDirectory, fileName)
 	id = strings.ReplaceAll(id, " ", "_")
 
