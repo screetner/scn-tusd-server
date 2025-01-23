@@ -22,9 +22,10 @@ func PreCreateHookHandler(req hooks.HookRequest) (res hooks.HookResponse, err er
 		return res, fileNameErr
 	}
 
-	sessionName, sessionNameErr := validateMetaDataField(&res, &req, "sessionName")
-	if sessionNameErr != nil {
-		return res, sessionNameErr
+	// TODO: test this
+	sessionCloudName, sessionCloudNameErr := validateMetaDataField(&res, &req, "sessionCloudName")
+	if sessionCloudNameErr != nil {
+		return res, sessionCloudNameErr
 	}
 
 	if res.ChangeFileInfo.MetaData == nil {
@@ -61,7 +62,7 @@ func PreCreateHookHandler(req hooks.HookRequest) (res hooks.HookResponse, err er
 	if backendResp.StatusCode == 403 {
 		res.RejectUpload = true
 		res.HTTPResponse.StatusCode = 403
-		res.HTTPResponse.Body = "skibid"
+		res.HTTPResponse.Body = "User's tusd token is invalid"
 		return res, nil
 	}
 
@@ -80,11 +81,8 @@ func PreCreateHookHandler(req hooks.HookRequest) (res hooks.HookResponse, err er
 	userId := userInfo.UserId
 	username := userInfo.UserName
 
-	postfix := userId
-
 	organizationDirectory := fmt.Sprintf("%s_%s", organizationName, organizationId)
-	sessionDirectory := fmt.Sprintf("%s_%s", sessionName, postfix)
-	id := fmt.Sprintf("%s/records/%s/%s", organizationDirectory, sessionDirectory, fileName)
+	id := fmt.Sprintf("%s/records/%s/%s", organizationDirectory, sessionCloudName, fileName)
 	id = strings.ReplaceAll(id, " ", "_")
 
 	res.ChangeFileInfo.ID = id
